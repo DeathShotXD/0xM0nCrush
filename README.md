@@ -188,6 +188,23 @@ A template ships as `targets.example.conf`.
 - SenseCncProxy.exe
 - SenseSampleUploader.exe
 
+## Detection
+
+Signs of this tool on a host, and how to hunt them, are in
+[docs/detection.md](docs/detection.md): the driver load through the Service
+Control Manager, the device handle and the IOCTL, the randomized service
+name, and the cleanup trail.
+
+## Compatibility
+
+Verified builds and blocklist status are recorded in
+[docs/compatibility.md](docs/compatibility.md).
+
+## Documentation
+
+- [docs/detection.md](docs/detection.md)
+- [docs/compatibility.md](docs/compatibility.md)
+
 ## Credits
 
 - HONOR for the signed driver
