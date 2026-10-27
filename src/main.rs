@@ -160,19 +160,35 @@ fn main() {
     let drv_file = ops::resolve_driver_path(&opts.driver_path.clone().unwrap_or_else(obf::driver_filename));
     let svc_name = opts.service_name.clone().unwrap_or_else(ops::random_service_name);
 
-    let mut _drv_svc: Option<loader::DriverService> = None;
+    let mut driver_service: Option<loader::DriverService> = None;
     let dev = match driver::MonDev::open() {
         Ok(d) => {
             println!("[+] driver already loaded");
             d
         }
         Err(_) => {
-            let svc = loader::DriverService::install(&svc_name, &drv_file)
-                .unwrap_or_else(|e| { println!("fatal: {e}"); flush_and_exit(EXIT_DRIVER_FAIL); });
-            svc.start().unwrap_or_else(|e| { println!("fatal: {e}"); flush_and_exit(EXIT_DRIVER_FAIL); });
-            let d = driver::MonDev::open().unwrap_or_else(|e| { println!("fatal: {e}"); flush_and_exit(EXIT_DRIVER_FAIL); });
+            let svc = match loader::DriverService::install(&svc_name, &drv_file) {
+                Ok(svc) => svc,
+                Err(e) => {
+                    println!("fatal: {e}");
+                    flush_and_exit(EXIT_DRIVER_FAIL);
+                }
+            };
+            if let Err(e) = svc.start() {
+                println!("fatal: {e}");
+                drop(svc);
+                flush_and_exit(EXIT_DRIVER_FAIL);
+            }
+            let d = match driver::MonDev::open() {
+                Ok(d) => d,
+                Err(e) => {
+                    println!("fatal: {e}");
+                    drop(svc);
+                    flush_and_exit(EXIT_DRIVER_FAIL);
+                }
+            };
             println!("[+] driver loaded");
-            _drv_svc = Some(svc);
+            driver_service = Some(svc);
             d
         }
     };
@@ -186,6 +202,7 @@ fn main() {
             for (n, p) in &procs { println!("  {n} ({p})"); }
         }
         drop(dev);
+        drop(driver_service.take());
         flush_and_exit(if procs.is_empty() { EXIT_NO_TARGET } else { EXIT_OK });
     }
 
@@ -224,5 +241,6 @@ fn main() {
     }
 
     drop(dev);
+    drop(driver_service.take());
     flush_and_exit(if total_killed > 0 { EXIT_OK } else { EXIT_NO_TARGET });
 }

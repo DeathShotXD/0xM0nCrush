@@ -5,9 +5,9 @@ How the tool looks on a host, and where to look for it.
 ## Driver load
 
 The driver is installed as a kernel service through the Service Control
-Manager. Watch for a service creation followed immediately by a start,
-where the binary path points at a `.sys` file with a randomized service
-name.
+Manager when it is not already loaded. Watch for a service creation
+followed immediately by a start, where the binary path points at a `.sys`
+file with a randomized service name.
 
 - Event ID 7045 in the System log: a new service installed, with a
   random name and a `.sys` image path.
@@ -25,7 +25,10 @@ The user-mode component opens the driver device and sends one IOCTL.
 
 ## Cleanup trail
 
-The service is stopped and deleted on exit, so the durable evidence is:
+When 0xM0nCrush created the temporary service, it is stopped and deleted
+before the loader exits. If `MonProcessEX` was already loaded, the loader
+reuses it and leaves the existing service in place. A service that
+already existed is never deleted. The durable evidence is:
 
 - The 7045/4697 service events and the SCM deletion.
 - The Prefetch entry for the loader when self-destruct is not used,

@@ -11,6 +11,7 @@ use windows::Win32::System::Services::{
 pub struct DriverService {
     scm: SC_HANDLE,
     svc: SC_HANDLE,
+    created: bool,
 }
 
 impl DriverService {
@@ -25,7 +26,7 @@ impl DriverService {
         let existing = unsafe { OpenServiceW(scm, PCWSTR(name_w.as_ptr()), SERVICE_ALL_ACCESS) };
         if existing.is_ok() {
             let svc = existing.unwrap();
-            return Ok(Self { scm, svc });
+            return Ok(Self { scm, svc, created: false });
         }
 
         let svc = unsafe {
@@ -50,7 +51,7 @@ impl DriverService {
             format!("CreateService: {e}")
         })?;
 
-        Ok(Self { scm, svc })
+        Ok(Self { scm, svc, created: true })
     }
 
     pub fn start(&self) -> Result<(), String> {
@@ -60,9 +61,14 @@ impl DriverService {
 
 impl Drop for DriverService {
     fn drop(&mut self) {
-        // Stop + delete the service so no driver artifact survives the run.
-        let _ = unsafe { ControlService(self.svc, SERVICE_CONTROL_STOP, &mut SERVICE_STATUS::default()) };
-        let _ = unsafe { DeleteService(self.svc) };
+        // Only remove the service this run created. A pre-existing service
+        // belongs to the host and must be left in place.
+        if self.created {
+            let _ = unsafe {
+                ControlService(self.svc, SERVICE_CONTROL_STOP, &mut SERVICE_STATUS::default())
+            };
+            let _ = unsafe { DeleteService(self.svc) };
+        }
         unsafe {
             let _ = CloseServiceHandle(self.svc);
             let _ = CloseServiceHandle(self.scm);
