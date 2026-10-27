@@ -1,4 +1,19 @@
-# 0xM0nCrush
+<p align="center">
+  <img src="assets/hero.svg" alt="0xM0nCrush - kernel-mode process termination" width="100%">
+</p>
+
+<p align="center">
+  <a href="docs/compatibility.md"><img src="https://img.shields.io/badge/Windows-10%20%7C%2011-0b0f14?style=flat-square&amp;logo=windows&amp;logoColor=c8ff3d" alt="Windows 10 and 11"></a>
+  <img src="https://img.shields.io/badge/Rust-2021-0b0f14?style=flat-square&amp;logo=rust&amp;logoColor=c8ff3d" alt="Rust 2021">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-0b0f14?style=flat-square" alt="MIT license"></a>
+  <img src="https://img.shields.io/badge/BYOVD-research%20only-a78bfa?style=flat-square" alt="BYOVD research only">
+  <a href="https://github.com/DeathShotXD/0xM0nCrush/stargazers"><img src="https://img.shields.io/github/stars/DeathShotXD/0xM0nCrush?style=flat-square&amp;color=c8ff3d" alt="GitHub stars"></a>
+</p>
+
+<p align="center">
+  <strong>Cross-version Windows process termination from kernel context.</strong><br>
+  One signed driver. One IOCTL. No offsets. No PDB.
+</p>
 
 A cross-version Windows process terminator. It loads a signed HONOR
 kernel driver (`MonProcessEX.sys`), resolves the PID of every target
@@ -6,15 +21,12 @@ process, and terminates it from kernel context through a single IOCTL.
 No kernel offsets, no PDB downloads, no build-specific shellcode - the
 technique works identically on every Windows 10 and Windows 11 build.
 
-The tool is a single self-contained executable. It installs the driver
-through the Service Control Manager, performs the kill, then stops and
-deletes the service, leaving no persistent artifact behind. Targets are
-configurable at runtime through a config file, command line, or the
-built-in defaults.
-
-<p align="center">
-  <img src="assets/logo.jpeg" alt="0xM0nCrush" width="800">
-</p>
+The tool is a single self-contained executable. When it needs the driver,
+it installs it through the Service Control Manager, performs the kill, and
+stops and deletes the temporary service before exiting. If `MonProcessEX.sys`
+is already loaded, it reuses the existing driver and leaves it in place.
+Targets are configurable at runtime through a config file, command line, or
+the built-in defaults.
 
 > **Cross-version by design.** One driver, one IOCTL, one kill
 > primitive. Works on all Windows 10 and Windows 11 builds.
@@ -27,7 +39,7 @@ built-in defaults.
 
    moncrush.exe -n "notepad.exe,calc.exe"
 
-3. Targets die. Driver unloads itself. Done.
+3. Targets die. The temporary driver service is cleaned up. Done.
 ```
 
 No toolchain, no offsets, no build step.
@@ -47,7 +59,7 @@ No toolchain, no offsets, no build step.
 | PPL bypass | `MonProcessEX.sys` kill path bypasses protected-process checks |
 | Signed driver | `MonProcessEX.sys` is a real signed HONOR driver |
 | Not in MS block rules | Absent from Microsoft's vulnerable-driver block rules |
-| Self-sufficient | Driver installed, started, and cleaned up via SCM |
+| Self-sufficient | Temporary driver installed, started, and cleaned up via SCM; a preloaded driver is reused as-is |
 | Zero dependencies | Static Rust binary; drop exe + driver, run |
 | Configurable | `targets.conf` or `-n`, no recompile needed |
 | Obfuscated | Device path and target list encrypted at rest |
@@ -92,8 +104,8 @@ No toolchain, no offsets, no build step.
 |                                                                                           |
 |   CLEANUP                                                                                 |
 |   +---------------------------------------------------------------------------------+     |
-|   |   SCM service stopped and deleted                                               |     |
-|   |   driver unloaded, no persistent artifact                                       |     |
+|   |   temporary service stopped + deleted (when this run created it)                |     |
+|   |   preloaded driver reused as-is; never force-unloaded                           |     |
 |   +---------------------------------------------------------------------------------+     |
 +-------------------------------------------------------------------------------------------+
 ```
@@ -144,6 +156,33 @@ Exit codes: `0` ok, `2` no targets, `3` driver failed, `5` environment
 abort. Target resolution order: `--names` > `--config` > `targets.conf`
 (disk) > built-in defaults.
 
+## Driver lifecycle and unloading
+
+0xM0nCrush terminates processes, not drivers. `-n` / `--names` expects
+process names, so `moncrush.exe -n "example.sys"` does not unload
+`example.sys`; it looks for a running process with that name.
+
+```powershell
+moncrush.exe -n "notepad.exe,calc.exe"      # correct: process names
+```
+
+When this run creates the temporary service for `MonProcessEX.sys`, the
+loader stops and deletes that service before exiting. A driver that was
+already loaded before launch is reused and left in place; it is not
+force-unloaded. A service that already existed is never deleted.
+
+To remove another driver, control its service from an elevated shell:
+
+```powershell
+sc.exe query type= driver state= all
+sc.exe stop "<serviceName>"
+sc.exe delete "<serviceName>"
+```
+
+`sc.exe stop` can fail while the driver is in use; `sc.exe delete` removes
+the service registration and may require a reboot. Full details:
+[docs/driver-unloading.md](docs/driver-unloading.md).
+
 ### Operational hardening
 
 - **Environment checks.** Verifies the system is not a common
@@ -154,7 +193,9 @@ abort. Target resolution order: `--names` > `--config` > `targets.conf`
 - **Delayed execution.** `--delay <ms>` sleeps before doing anything,
   breaking time-correlation with initial execution.
 - **Driver hygiene.** The driver is installed under a randomized service
-  name and stopped and deleted on exit, leaving no persistent artifact.
+  name, and only a service created by this run is stopped and deleted
+  before exit. A pre-existing driver or service is reused and left
+  untouched.
 - **Self-destruct.** `-x` deletes the executable and purges its Prefetch
   entry after a successful run.
 
@@ -204,6 +245,7 @@ Verified builds and blocklist status are recorded in
 
 - [docs/detection.md](docs/detection.md)
 - [docs/compatibility.md](docs/compatibility.md)
+- [docs/driver-unloading.md](docs/driver-unloading.md)
 
 ## Credits
 

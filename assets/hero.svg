@@ -1,0 +1,133 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 420" width="1280" height="420" role="img" aria-labelledby="title desc">
+  <title id="title">0xM0nCrush — kernel-mode process termination</title>
+  <desc id="desc">Dark terminal-style banner with acid green accents, a signed-driver status strip, and a sample 0xM0nCrush run.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#05070a"/>
+      <stop offset=".55" stop-color="#090c12"/>
+      <stop offset="1" stop-color="#0d0917"/>
+    </linearGradient>
+    <radialGradient id="acidGlow" cx=".16" cy=".22" r=".65">
+      <stop offset="0" stop-color="#c8ff3d" stop-opacity=".18"/>
+      <stop offset=".55" stop-color="#c8ff3d" stop-opacity=".04"/>
+      <stop offset="1" stop-color="#c8ff3d" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="violetGlow" cx=".92" cy=".1" r=".7">
+      <stop offset="0" stop-color="#a78bfa" stop-opacity=".22"/>
+      <stop offset=".6" stop-color="#a78bfa" stop-opacity=".04"/>
+      <stop offset="1" stop-color="#a78bfa" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="acid" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#e8ff9a"/>
+      <stop offset=".45" stop-color="#c8ff3d"/>
+      <stop offset="1" stop-color="#7dffb2"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#0d1119" stop-opacity=".96"/>
+      <stop offset="1" stop-color="#080a10" stop-opacity=".96"/>
+    </linearGradient>
+    <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+      <path d="M 40 0 L 0 0 0 40" fill="none" stroke="#c8ff3d" stroke-opacity=".08" stroke-width="1"/>
+    </pattern>
+    <pattern id="scan" width="6" height="6" patternUnits="userSpaceOnUse">
+      <rect width="6" height="1" fill="#ffffff" fill-opacity=".018"/>
+    </pattern>
+    <filter id="softGlow" x="-40%" y="-40%" width="180%" height="180%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <filter id="lineGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <style>
+      .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+      .sans { font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      .eyebrow { font-size: 13px; font-weight: 700; letter-spacing: 3.5px; fill: #c8ff3d; }
+      .title { font-size: 70px; font-weight: 800; letter-spacing: -3px; fill: #f7ffe7; }
+      .subtitle { font-size: 17px; font-weight: 600; letter-spacing: 1.2px; fill: #aeb8c4; }
+      .muted { font-size: 14px; fill: #74808f; }
+      .terminal { font-size: 13.5px; fill: #c9d4df; }
+      .prompt { fill: #c8ff3d; font-weight: 700; }
+      .ok { fill: #7dffb2; }
+      .warn { fill: #a78bfa; }
+      .chip { font-size: 11.5px; font-weight: 700; letter-spacing: 1.2px; fill: #dce8d1; }
+      .tiny { font-size: 10.5px; letter-spacing: 1.5px; fill: #6c7887; }
+    </style>
+  </defs>
+
+  <rect width="1280" height="420" fill="url(#bg)"/>
+  <rect width="1280" height="420" fill="url(#grid)" opacity=".7"/>
+  <rect width="1280" height="420" fill="url(#scan)"/>
+  <rect width="1280" height="420" fill="url(#acidGlow)"/>
+  <rect width="1280" height="420" fill="url(#violetGlow)"/>
+
+  <g stroke="#c8ff3d" stroke-opacity=".36" fill="none" stroke-width="1.5">
+    <path d="M28 64 V28 H64"/>
+    <path d="M1216 28 H1252 V64"/>
+    <path d="M28 356 V392 H64"/>
+    <path d="M1216 392 H1252 V356"/>
+  </g>
+
+  <g transform="translate(64 56)">
+    <rect x="0" y="0" width="38" height="38" rx="9" fill="#c8ff3d" fill-opacity=".1" stroke="#c8ff3d" stroke-opacity=".55"/>
+    <text x="19" y="26" text-anchor="middle" class="mono" font-size="17" font-weight="800" fill="#c8ff3d">0x</text>
+    <text x="52" y="17" class="mono eyebrow">0xM0NCRUSH</text>
+    <text x="52" y="33" class="mono tiny">WINDOWS 10 / 11 · BYOVD · RING 0</text>
+  </g>
+
+  <text x="64" y="172" class="sans title">0xM0nCrush</text>
+  <text x="66" y="212" class="mono subtitle">TERMINATE PROCESSES FROM KERNEL CONTEXT.</text>
+  <text x="66" y="238" class="sans muted">One signed driver. One IOCTL. No offsets. No PDB.</text>
+
+  <g transform="translate(66 276)">
+    <rect x="0" y="0" width="150" height="30" rx="15" fill="#c8ff3d" fill-opacity=".08" stroke="#c8ff3d" stroke-opacity=".35"/>
+    <circle cx="16" cy="15" r="3.5" fill="#c8ff3d"/>
+    <text x="28" y="19" class="mono chip">SIGNED DRIVER</text>
+
+    <rect x="162" y="0" width="136" height="30" rx="15" fill="#a78bfa" fill-opacity=".08" stroke="#a78bfa" stroke-opacity=".34"/>
+    <circle cx="178" cy="15" r="3.5" fill="#a78bfa"/>
+    <text x="190" y="19" class="mono chip">NO OFFSETS</text>
+
+    <rect x="310" y="0" width="144" height="30" rx="15" fill="#7dffb2" fill-opacity=".07" stroke="#7dffb2" stroke-opacity=".3"/>
+    <circle cx="326" cy="15" r="3.5" fill="#7dffb2"/>
+    <text x="338" y="19" class="mono chip">CLEAN EXIT</text>
+  </g>
+
+  <text x="66" y="350" class="mono tiny">GITHUB.COM/DEATHSHOTXD/0XM0NCRUSH</text>
+
+  <g transform="translate(698 58)">
+    <rect x="0" y="0" width="518" height="304" rx="16" fill="url(#panel)" stroke="#c8ff3d" stroke-opacity=".24"/>
+    <rect x="0" y="0" width="518" height="304" rx="16" fill="none" stroke="#ffffff" stroke-opacity=".04"/>
+
+    <path d="M0 44 H518" stroke="#ffffff" stroke-opacity=".08"/>
+    <circle cx="22" cy="22" r="5" fill="#ff6b6b" fill-opacity=".75"/>
+    <circle cx="40" cy="22" r="5" fill="#ffd166" fill-opacity=".75"/>
+    <circle cx="58" cy="22" r="5" fill="#7dffb2" fill-opacity=".75"/>
+    <text x="82" y="26" class="mono tiny">ELEVATED POWERSHELL</text>
+    <text x="496" y="26" text-anchor="end" class="mono tiny">0xM0nCrush</text>
+
+    <g class="mono terminal">
+      <text x="24" y="78"><tspan class="prompt">PS&gt;</tspan> moncrush.exe -n "notepad.exe,calc.exe"</text>
+      <text x="24" y="110" class="ok">[+] driver loaded</text>
+      <text x="24" y="138">(+) terminated notepad.exe <tspan class="warn">(2124)</tspan></text>
+      <text x="24" y="166">(+) terminated calc.exe <tspan class="warn">(8840)</tspan></text>
+      <text x="24" y="204" class="muted">[+] temporary service stopped + deleted</text>
+      <text x="24" y="232" class="muted">[+] exit 0 · 2 targets terminated</text>
+      <text x="24" y="272" class="prompt">PS&gt; <tspan fill="#74808f">_</tspan></text>
+    </g>
+
+    <rect x="24" y="286" width="470" height="1" fill="#c8ff3d" fill-opacity=".2" filter="url(#lineGlow)"/>
+    <text x="24" y="299" class="mono tiny" fill="#c8ff3d" fill-opacity=".7">PROCESS TERMINATION · KERNEL CONTEXT · SINGLE IOCTL</text>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <circle cx="1198" cy="352" r="3" fill="#c8ff3d" opacity=".85"/>
+  </g>
+</svg>
